@@ -1,0 +1,36 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Fixes the "/opt/render/project/src/ThisAIntIt" build error: that path came from
+# a stale "Root Directory" set in the Render dashboard (left over from a repo
+# rename) plus a Dockerfile path that assumed root-level Dockerfiles. Neither
+# Dockerfile lives at the repo root — see docker-compose.yml — so both services
+# below are defined with an empty root dir and an explicit dockerfilePath/
+# dockerContext pointing at api-service/ and worker-service/ respectively.
+#
+# Kafka itself is NOT deployed here — Render has no managed Kafka product.
+# Point SPRING_KAFKA_BOOTSTRAP_SERVERS at an external broker (Confluent Cloud,
+# Upstash Kafka, CloudKarafka, etc.) and fill in the secret values below in the
+# Render dashboard after the first deploy; this blueprint only reserves them.
+
+services:
+  - type: web
+    name: api-service
+    runtime: docker
+    dockerfilePath: ./api-service/Dockerfile
+    dockerContext: .
+    plan: starter
+    envVars:
+      - key: SPRING_KAFKA_BOOTSTRAP_SERVERS
+        sync: false
+
+  - type: worker
+    name: worker-service
+    runtime: docker
+    dockerfilePath: ./worker-service/Dockerfile
+    dockerContext: .
+    plan: starter
+    envVars:
+      - key: SPRING_KAFKA_BOOTSTRAP_SERVERS
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
