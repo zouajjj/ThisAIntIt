@@ -1,0 +1,3 @@
+{$DUCKDNS_DOMAIN} {
+	reverse_proxy api-service:8080
+}

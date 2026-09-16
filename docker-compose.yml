@@ -49,10 +49,24 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    ports:
-      - "8080:8080"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    depends_on:
+      - api-service
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DUCKDNS_DOMAIN: ${DUCKDNS_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
 
   worker-service:
     build:
@@ -68,3 +82,7 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY}
     env_file:
       - .env
+
+volumes:
+  caddy_data:
+  caddy_config:
