@@ -19,7 +19,10 @@ COPY --from=frontend-build /frontend/build ./src/main/resources/static
 RUN mvn -B clean package -DskipTests
 
 # --- Stage 3: slim runtime image ---
-FROM eclipse-temurin:17-jre-alpine AS runtime
+# Not eclipse-temurin:17-jre-alpine: that tag has no arm64 manifest, which breaks
+# on Oracle Cloud's free-tier Ampere (A1.Flex, arm64) VMs. This glibc-based tag
+# is multi-arch (amd64 + arm64).
+FROM eclipse-temurin:17-jre AS runtime
 WORKDIR /app
 COPY --from=backend-build /app/target/*.jar app.jar
 EXPOSE 8080
