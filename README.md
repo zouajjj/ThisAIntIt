@@ -1,5 +1,6 @@
 # AIn't
 An async, Kafka-driven chat backend split into two independent Spring Boot microservices, fronted by a React UI, containerized end to end with Docker Compose.
+Demo: https://thisaiintit.duckdns.org/ 
 
 ## Why I built this
 
